@@ -1,4 +1,4 @@
-"project_identifier" : "winsparkle"
+"project_id" : 82678
 "base_path" : "translations"
 "preserve_hierarchy" : false
 
@@ -32,6 +32,7 @@
         "is": "is",
         "it": "it",
         "ja": "ja",
+        "ka": "ka",
         "ko": "ko",
         "kk": "kk",
         "lt": "lt",
@@ -45,6 +46,7 @@
         "sv-SE": "sv",
         "th": "th",
         "tr": "tr",
+        "ug": "ug",
         "uk": "uk",
         "zh-CN": "zh_CN",
         "zh-TW": "zh_TW"
