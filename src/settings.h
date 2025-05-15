@@ -134,23 +134,13 @@ public:
     /// Return true if DSA public key is available
     static bool HasDSAPubKeyPem()
     {
-        try
-        {
-            return !GetDSAPubKeyPem().empty();
-        }
-        CATCH_ALL_EXCEPTIONS
-        return false;
+        return !GetDSAPubKeyPem().empty();
     }
 
     /// Return true if EdDSA public key is available
     static bool HasEdDSAPubKey()
     {
-        try
-        {
-            return !GetEdDSAPubKey().empty();
-        }
-        CATCH_ALL_EXCEPTIONS
-        return false;
+        return !GetEdDSAPubKey().empty();
     }
 
     //@}

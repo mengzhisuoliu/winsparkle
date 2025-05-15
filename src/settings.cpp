@@ -161,7 +161,8 @@ std::string Settings::GetCustomResource(const char *name, const char *type)
     err += "\" (type \"";
     err += type;
     err += "\")";
-    throw Win32Exception(err.c_str());
+    LogError(err);
+    return std::string();
 }
 
 
