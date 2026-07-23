@@ -3,8 +3,8 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <EnableASAN Condition="'$(PlatformToolset)'=='v143' Or '$(PlatformToolset)'=='v145'">true</EnableASAN>
-    <EnableASAN Condition="'$(Platform)'=='ARM64' And '$(PlatformToolset)'!='v145'">false</EnableASAN>
+    <!-- ASan is too broken on ARM64 or VS2022 to use. -->
+    <EnableASAN Condition="'$(PlatformToolset)'=='v145' And '$(Platform)'!='ARM64'">true</EnableASAN>
     <CopyAsanBinariesToOutDir Condition="'$(EnableASAN)'=='true'">true</CopyAsanBinariesToOutDir>
     <LinkIncremental Condition="'$(EnableASAN)'=='true'">false</LinkIncremental>
   </PropertyGroup>
