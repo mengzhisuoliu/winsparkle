@@ -53,7 +53,7 @@ Check the sources out and initialize the submodules:
     $ git submodule init
     $ git submodule update
 
-To compile the library, open the `WinSparkle.sln` solution in Visual Studio and build it.
+To compile the library, open the `WinSparkle.sln` solution in Visual Studio and build it. VS2017 or newer is required.
 
 There are also unsupported CMake build files in the cmake directory.
 
