@@ -228,7 +228,7 @@ void UpdateChecker::PerformUpdateCheck()
         CheckForInsecureURL(url, "appcast feed");
 
         StringDownloadSink appcast_xml;
-        DownloadFile(url, &appcast_xml, this, Settings::GetHttpHeadersString(), Download_BypassProxies);
+        DownloadFile(url, &appcast_xml, this, Settings::GetHttpHeadersString(), Download_NoProxyCache);
 
         auto all = Appcast::Load(appcast_xml.data);
 

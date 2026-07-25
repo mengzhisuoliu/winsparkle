@@ -76,8 +76,8 @@ struct StringDownloadSink : public IDownloadSink
 /// Flags for DownloadFile().
 enum DownloadFlag
 {
-    /// Instruct proxies to pass the request upstream
-    Download_BypassProxies = 1
+    /// Instruct caching proxies to pass the request upstream
+    Download_NoProxyCache = 1
 };
 
 /**
