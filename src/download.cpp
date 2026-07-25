@@ -34,6 +34,9 @@
 #include <windows.h>
 #include <wininet.h>
 
+#ifndef INTERNET_OPTION_COMPRESSED_CONTENT_LENGTH
+    #define INTERNET_OPTION_COMPRESSED_CONTENT_LENGTH 147
+#endif
 #ifndef INTERNET_OPTION_ENABLE_HTTP_PROTOCOL
     #define INTERNET_OPTION_ENABLE_HTTP_PROTOCOL 148
 #endif
@@ -275,8 +278,24 @@ void DownloadFile(const std::string& url, IDownloadSink* sink, Thread* onThread,
 
     // Get content length if possible:
     DWORD contentLength;
-    if ( GetHttpHeader(conn, HTTP_QUERY_CONTENT_LENGTH, contentLength) )
+    if (GetHttpHeader(conn, HTTP_QUERY_CONTENT_LENGTH, contentLength))
+    {
         sink->SetLength(contentLength);
+    }
+    else
+    {
+        // Try using INTERNET_OPTION_COMPRESSED_CONTENT_LENGTH too (win10+), in case
+        // the server sent Content-Encoding: gzip and HTTP_QUERY_CONTENT_LENGTH is missing.
+        ULONGLONG compressedLength = 0;
+        DWORD compressedLengthSize = sizeof(compressedLength);
+        if (InternetQueryOptionA(conn,
+                                 INTERNET_OPTION_COMPRESSED_CONTENT_LENGTH,
+                                 &compressedLength,
+                                 &compressedLengthSize))
+        {
+            sink->SetLength(static_cast<size_t>(compressedLength));
+        }
+    }
 
     // Get filename fron Content-Disposition, if available
     char contentDisposition[512];

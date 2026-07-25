@@ -33,6 +33,7 @@
 
 #include <wx/string.h>
 
+#include <algorithm>
 #include <sstream>
 #include <rpc.h>
 #include <time.h>
@@ -87,10 +88,10 @@ std::wstring CreateUniqueTempDirectory()
 
 struct UpdateDownloadSink : public IDownloadSink
 {
-    UpdateDownloadSink(Thread& thread, const std::wstring& dir)
+    UpdateDownloadSink(Thread& thread, const std::wstring& dir, size_t expectedLength = 0)
         : m_thread(thread),
           m_dir(dir), m_file(NULL),
-          m_downloaded(0), m_total(0), m_lastUpdate(-1)
+          m_downloaded(0), m_total(expectedLength), m_lastUpdate(-1)
     {}
 
     ~UpdateDownloadSink() { Close(); }
@@ -106,7 +107,13 @@ struct UpdateDownloadSink : public IDownloadSink
 
     std::wstring GetFilePath(void) { return m_path; }
 
-    virtual void SetLength(size_t l) { m_total = l; }
+    virtual void SetLength(size_t l)
+    {
+        // Use the best of the information we have: appcast-provided length (which may be missing)
+        // and Content-Length (this call; may be wrong if server sends compressed data).
+        using namespace std;
+        m_total = max(m_total, l);
+    }
 
     virtual void SetFilename(const std::wstring& filename)
     {
@@ -130,9 +137,15 @@ struct UpdateDownloadSink : public IDownloadSink
             throw std::runtime_error("Cannot save update file");
         m_downloaded += len;
 
+        // Neither the appcast nor HTTP metadata is necessarily reliable. If
+        // the download exceeds both estimates, revert to indeterminate progress.
+        const bool lengthExceeded = m_total && m_downloaded > m_total;
+        if (lengthExceeded)
+            m_total = 0;
+
         // only update at most 10 times/sec so that we don't flood the UI:
         clock_t now = clock();
-        if ( now == -1 || m_downloaded == m_total ||
+        if ( now == -1 || lengthExceeded || m_downloaded == m_total ||
              ((double(now - m_lastUpdate) / CLOCKS_PER_SEC) >= 0.1) )
         {
           UI::NotifyDownloadProgress(m_downloaded, m_total);
@@ -176,7 +189,7 @@ void UpdateDownloader::Run()
       const std::wstring tmpdir = CreateUniqueTempDirectory();
       Settings::WriteConfigValue("UpdateTempDir", tmpdir);
 
-      UpdateDownloadSink sink(*this, tmpdir);
+      UpdateDownloadSink sink(*this, tmpdir, m_appcast.enclosure.Length);
       DownloadFile(m_appcast.enclosure.DownloadURL, &sink, this, Settings::GetHttpHeadersString());
       sink.Close();
 

@@ -28,6 +28,8 @@
 
 #include <expat.h>
 #include <algorithm>
+#include <charconv>
+#include <cstdlib>
 #include <iterator>
 #include <vector>
 #include <windows.h>
@@ -177,6 +179,7 @@ void trim_whitespace(std::string& s)
 #define NODE_MIN_OS_VERSION NS_SPARKLE_NAME("minimumSystemVersion")
 #define NODE_CRITICAL_UPDATE NS_SPARKLE_NAME("criticalUpdate")
 #define ATTR_URL        "url"
+#define ATTR_LENGTH     "length"
 #define ATTR_VERSION    NS_SPARKLE_NAME("version")
 #define ATTR_SHORTVERSION NS_SPARKLE_NAME("shortVersionString")
 #define ATTR_DSASIGNATURE NS_SPARKLE_NAME("dsaSignature")
@@ -287,6 +290,8 @@ void XMLCALL OnStartElement(void *data, const char *name, const char **attrs)
 
                 if (strcmp(name, ATTR_URL) == 0)
                     enclosure.DownloadURL = value;
+                else if (strcmp(name, ATTR_LENGTH) == 0)
+                    std::from_chars(value, value + strlen(value), enclosure.Length);
                 else if (strcmp(name, ATTR_EDDSASIGNATURE) == 0)
                     enclosure.EdDsaSignature = value;
                 else if (strcmp(name, ATTR_DSASIGNATURE) == 0)

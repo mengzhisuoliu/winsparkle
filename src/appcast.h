@@ -65,6 +65,9 @@ struct Appcast
         /// URL of the update
         std::string DownloadURL;
 
+        /// Expected size of the update, or 0 if unknown
+        unsigned Length = 0;
+
         /// Signing signature of the update
         std::string DsaSignature;
 
