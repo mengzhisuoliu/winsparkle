@@ -2,8 +2,13 @@
 
 #include "signatureverifier.h"
 
+#include <chrono>
+#include <cstdint>
+#include <cstdlib>
 #include <stdexcept>
 #include <string>
+#include <thread>
+#include <vector>
 
 #include <windows.h>
 
@@ -212,6 +217,223 @@ TEST(DSA, RejectsSignatureWithTrailingGarbage)
         PublicKey2048,
         "MD0CHA/vqU2IV2dj0D+3HJa7jmIMI37T/p6kONVs/gUCHQCUFsBdXoCQFTL0ovuISVcymQseCD+mcfQjqDQcAA==",
         reinterpret_cast<const uint8_t*>("payload"), sizeof("payload") - 1));
+}
+
+
+namespace
+{
+
+constexpr char kPayload[] = "Malformed signature parser test payload.\n\n";
+constexpr size_t kMaxBase64SignatureSize = 1000;
+
+constexpr char kPublicKey[] =
+    "-----BEGIN PUBLIC KEY-----\n"
+    "MIIBtjCCASsGByqGSM44BAEwggEeAoGBAKU8/avmkFeGnSqwYG7dZnQlG+01QNax\n"
+    "u3F5v0NcL/SRUW7IdpUq8t14siK0mA6yjphLhOf5t8gugTEVBllP86ANSbFigH7W\n"
+    "N3v6ydJWqm60pNhNHN//50cnNtIsXbxeq3VtsI64pkH1OJqeZDHLmu73k4T0EKOz\n"
+    "sylSfF/wtVBJAhUAoabmyx1YsDwfo0r1G/HuEx0uzwUCgYAJD1PMCiTCQa1xyD/N\n"
+    "CWOajCufTOIzKAhm6l+nlBVPiKI+262XpYt127Ke4mPL8XJBizoTjSQN08uHMg/8\n"
+    "L6W/cdO2aZ+mhkBnS1xAm83DAwqLrDraR1w/4QRFxr5Vbyy8qnejrPjTJobBN1BG\n"
+    "sv84wHkjmoCn6pFIfkGYeATlJgOBhAACgYAHYPU1zMVBTDWru7SNC4G2UyWGWYYL\n"
+    "jLytBVHfQmBa51CmqrSs2kCfGLGA1ynfYENsxcJq9nsXrb4i17H5BHJFkH0g7BUD\n"
+    "peBeLr8gsK3WgfqWwtZsDkltObw9chUD/siK6q/dk/fSIB2Ho0inev7k68Z5ZkNI\n"
+    "4XOwuEssAVhmwA==\n"
+    "-----END PUBLIC KEY-----\n";
+
+void ExpectMalformedDerRejected(const char* signature)
+{
+    EXPECT_FALSE(SignatureVerifier::IsDSASHA1SignatureValid(
+        kPublicKey, signature, reinterpret_cast<const uint8_t*>(kPayload),
+        sizeof(kPayload) - 1));
+}
+
+void AppendDerLength(std::vector<unsigned char>* output, size_t length)
+{
+    if (length < 0x80)
+    {
+        output->push_back(static_cast<unsigned char>(length));
+        return;
+    }
+
+    unsigned char bytes[sizeof(length)];
+    size_t count = 0;
+    while (length != 0)
+    {
+        bytes[count++] = static_cast<unsigned char>(length & 0xFF);
+        length >>= 8;
+    }
+
+    output->push_back(static_cast<unsigned char>(0x80 | count));
+    while (count != 0)
+        output->push_back(bytes[--count]);
+}
+
+void AppendInteger(std::vector<unsigned char>* output, size_t size)
+{
+    output->push_back(0x02);
+    AppendDerLength(output, size);
+    output->insert(output->end(), size, 0xFF);
+}
+
+std::string Base64Encode(const std::vector<unsigned char>& input)
+{
+    constexpr char kAlphabet[] =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    std::string output;
+    output.reserve(((input.size() + 2) / 3) * 4);
+
+    for (size_t i = 0; i < input.size(); i += 3)
+    {
+        uint32_t chunk = static_cast<uint32_t>(input[i]) << 16;
+        if (i + 1 < input.size())
+            chunk |= static_cast<uint32_t>(input[i + 1]) << 8;
+        if (i + 2 < input.size())
+            chunk |= input[i + 2];
+
+        output.push_back(kAlphabet[(chunk >> 18) & 0x3F]);
+        output.push_back(kAlphabet[(chunk >> 12) & 0x3F]);
+        output.push_back(i + 1 < input.size() ? kAlphabet[(chunk >> 6) & 0x3F] : '=');
+        output.push_back(i + 2 < input.size() ? kAlphabet[chunk & 0x3F] : '=');
+    }
+
+    return output;
+}
+
+std::string MakeLargeSignature(size_t integer_size)
+{
+    std::vector<unsigned char> contents;
+    AppendInteger(&contents, integer_size);
+    AppendInteger(&contents, integer_size);
+
+    std::vector<unsigned char> der;
+    der.push_back(0x30);
+    AppendDerLength(&der, contents.size());
+    der.insert(der.end(), contents.begin(), contents.end());
+    return Base64Encode(der);
+}
+
+}  // namespace
+
+TEST(DSA, RejectsNonAsciiInput)
+{
+    // Non-ASCII input that must be rejected by the Base64 decoder.
+    const char signature[] = "\xC3\xA9\n\n";
+
+    EXPECT_FALSE(SignatureVerifier::IsDSASHA1SignatureValid(
+        kPublicKey, signature, reinterpret_cast<const uint8_t*>(kPayload),
+        sizeof(kPayload) - 1));
+}
+
+TEST(DSA, RejectsSequenceTagWithoutLength)
+{
+    // A SEQUENCE tag without a length byte.
+    const char signature[] = "MA==\n\n";
+    ExpectMalformedDerRejected(signature);
+}
+
+TEST(DSA, RejectsLongFormLengthWithoutLengthByte)
+{
+    // A one-byte long-form length without its length byte.
+    const char signature[] = "MIE=\n\n";
+    ExpectMalformedDerRejected(signature);
+}
+
+TEST(DSA, RejectsEightMissingLengthBytes)
+{
+    // A long-form length claiming eight missing length bytes.
+    const char signature[] = "MIg=\n\n";
+    ExpectMalformedDerRejected(signature);
+}
+
+TEST(DSA, RejectsEmptySequence)
+{
+    // An empty SEQUENCE.
+    const char signature[] = "MAA=\n\n";
+    ExpectMalformedDerRejected(signature);
+}
+
+TEST(DSA, RejectsIntegerTagWithoutLength)
+{
+    // An INTEGER tag without a length byte.
+    const char signature[] = "MAEC\n\n";
+    ExpectMalformedDerRejected(signature);
+}
+
+TEST(DSA, RejectsIntegerWithMissingLongFormLengthByte)
+{
+    // An INTEGER with a missing long-form length byte.
+    const char signature[] = "MAICgQ==\n\n";
+    ExpectMalformedDerRejected(signature);
+}
+
+TEST(DSA, RejectsMissingSInteger)
+{
+    // A complete r followed by a missing s.
+    const char signature[] = "MAMCAQE=\n\n";
+    ExpectMalformedDerRejected(signature);
+}
+
+TEST(DSA, RejectsSIntegerWithoutLength)
+{
+    // A complete r and an s with a missing length byte.
+    const char signature[] = "MAYCAQECgQ==\n\n";
+    ExpectMalformedDerRejected(signature);
+}
+
+TEST(DSA, RejectsContentLargerThanInput)
+{
+    // A SEQUENCE whose declared content is larger than the input.
+    const char signature[] = "MIL//w==\n\n";
+    ExpectMalformedDerRejected(signature);
+}
+
+TEST(DSA, RejectsLengthClaiming127MissingBytes)
+{
+    // A length-of-length value claiming 127 missing bytes.
+    const char signature[] = "MP8=\n\n";
+    ExpectMalformedDerRejected(signature);
+}
+
+TEST(DSA, RejectsLengthThatWrapsPointerArithmetic)
+{
+    // An in-bounds SEQUENCE containing an INTEGER whose SIZE_MAX length wraps
+    // the `der + length` bounds check before mp_read_unsigned_bin is called.
+    const char signature[] = "MAoCiP//////////\n\n";
+    ExpectMalformedDerRejected(signature);
+}
+
+TEST(DSA, SignatureWithinLimitCompletesPromptly)
+{
+    const std::string signature = MakeLargeSignature(367);
+    ASSERT_EQ(996U, signature.size());
+    ASSERT_LT(signature.size(), kMaxBase64SignatureSize);
+
+    const auto start = std::chrono::steady_clock::now();
+    EXPECT_FALSE(SignatureVerifier::IsDSASHA1SignatureValid(
+        kPublicKey, signature.c_str(), reinterpret_cast<const uint8_t*>(kPayload),
+        sizeof(kPayload) - 1));
+    const auto elapsed = std::chrono::steady_clock::now() - start;
+
+    EXPECT_LT(elapsed, std::chrono::seconds(1));
+}
+
+TEST(DSA, OversizedSignatureIsRejectedWithoutUnboundedWork)
+{
+    const std::string signature = MakeLargeSignature(512 * 1024);
+    ASSERT_GT(signature.size(), kMaxBase64SignatureSize);
+
+    EXPECT_EXIT(
+        {
+            std::thread([]
+            {
+                Sleep(3000);
+                ExitProcess(EXIT_FAILURE);
+            }).detach();
+            ExitProcess(SignatureVerifier::IsDSASHA1SignatureValid(
+                kPublicKey, signature.c_str(), reinterpret_cast<const uint8_t*>(kPayload),
+                sizeof(kPayload) - 1) ? EXIT_FAILURE : EXIT_SUCCESS);
+        },
+        testing::ExitedWithCode(EXIT_SUCCESS), "");
 }
 
 } // namespace Crypto
