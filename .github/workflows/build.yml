@@ -42,6 +42,7 @@ jobs:
           ARM64/Release/winsparkle-tests.pdb
           ARM64/Release/WinSparkle.dll
           ARM64/Release/WinSparkle.pdb
+          ARM64/Release/*.bin
 
     - name: Archive binaries
       uses: actions/upload-artifact@v7
@@ -105,6 +106,7 @@ jobs:
             ARM64/Debug/winsparkle-tests.exe
             ARM64/Debug/*.dll
             ARM64/Debug/*.pdb
+            ARM64/Debug/*.bin
 
   test-arm64-vs2026:
     name: Test ARM64 (VS2026)
