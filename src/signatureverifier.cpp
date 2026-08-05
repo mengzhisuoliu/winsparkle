@@ -294,7 +294,7 @@ std::string Base64ToBin(const std::string &base64)
     }
 
     if (!ok)
-        throw std::runtime_error("Failed to decode base64 string");
+        throw std::invalid_argument("Failed to decode base64 string");
 
     return bin;
 }
@@ -319,12 +319,32 @@ void SignatureVerifier::VerifyEdDSAPubKey(const std::string& pubkey_base64)
 
 bool SignatureVerifier::IsDSASHA1SignatureValid(const std::string& dsa_pubkey_pem, const std::string& signature_base64, const uint8_t *buffer, size_t length)
 {
-    return TinySSL::inst().VerifyDSASHA1Signature(dsa_pubkey_pem, std::wstring(), buffer, length, Base64ToBin(signature_base64));
+    std::string signature;
+    try
+    {
+        signature = Base64ToBin(signature_base64);
+    }
+    catch (const std::invalid_argument&)
+    {
+        return false;
+    }
+
+    return TinySSL::inst().VerifyDSASHA1Signature(dsa_pubkey_pem, std::wstring(), buffer, length, signature);
 }
 
 bool SignatureVerifier::IsDSASHA1SignatureValid(const std::string& dsa_pubkey_pem, const std::string& signature_base64, const std::wstring& filename)
 {
-    return TinySSL::inst().VerifyDSASHA1Signature(dsa_pubkey_pem, filename, nullptr, 0, Base64ToBin(signature_base64));
+    std::string signature;
+    try
+    {
+        signature = Base64ToBin(signature_base64);
+    }
+    catch (const std::invalid_argument&)
+    {
+        return false;
+    }
+
+    return TinySSL::inst().VerifyDSASHA1Signature(dsa_pubkey_pem, filename, nullptr, 0, signature);
 }
 
 bool SignatureVerifier::IsEdDSASignatureValid(const std::string& pubkey_base64, const std::string& signature_base64, const uint8_t *buffer, size_t length)
@@ -335,7 +355,16 @@ bool SignatureVerifier::IsEdDSASignatureValid(const std::string& pubkey_base64, 
         return false;
     }
 
-    const std::string signature = Base64ToBin(signature_base64);
+    std::string signature;
+    try
+    {
+        signature = Base64ToBin(signature_base64);
+    }
+    catch (const std::invalid_argument&)
+    {
+        return false;
+    }
+
     if (signature.size() != 64)
     {
         LogError("Invalid signature size.");
