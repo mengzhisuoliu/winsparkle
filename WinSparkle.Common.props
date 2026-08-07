@@ -5,7 +5,16 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+        <LanguageStandard>stdcpp17</LanguageStandard>
+        <AdditionalIncludeDirectories>
+            $(MSBuildThisFileDirectory)include;
+            $(MSBuildThisFileDirectory)3rdparty\config;
+            $(MSBuildThisFileDirectory)3rdparty\expat\expat\lib;
+            $(MSBuildThisFileDirectory)3rdparty\ed25519\src;
+            $(MSBuildThisFileDirectory)3rdparty\openssl-win32;
+            $(MSBuildThisFileDirectory)3rdparty\wxWidgets\include;
+            %(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
