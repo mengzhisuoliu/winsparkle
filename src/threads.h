@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _threads_h_
-#define _threads_h_
+#ifndef WINSPARKLE_THREADS_H
+#define WINSPARKLE_THREADS_H
 
 #include "error.h"
 
@@ -188,4 +188,4 @@ protected:
 
 } // namespace winsparkle
 
-#endif // _threads_h_
+#endif // WINSPARKLE_THREADS_H

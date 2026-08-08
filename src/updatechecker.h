@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _updatechecker_h_
-#define _updatechecker_h_
+#ifndef WINSPARKLE_UPDATECHECKER_H
+#define WINSPARKLE_UPDATECHECKER_H
 
 #include "threads.h"
 
@@ -118,4 +118,4 @@ protected:
 
 } // namespace winsparkle
 
-#endif // _updatechecker_h_
+#endif // WINSPARKLE_UPDATECHECKER_H

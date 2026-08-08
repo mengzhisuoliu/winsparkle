@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _utils_h_
-#define _utils_h_
+#ifndef WINSPARKLE_UTILS_H
+#define WINSPARKLE_UTILS_H
 
 #include "error.h"
 
@@ -133,4 +133,4 @@ inline bool CheckForInsecureURL(const std::string& url, const std::string& purpo
 
 } // namespace winsparkle
 
-#endif // _utils_h_
+#endif // WINSPARKLE_UTILS_H

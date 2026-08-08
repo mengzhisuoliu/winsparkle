@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _signatureverifier_h_
-#define _signatureverifier_h_
+#ifndef WINSPARKLE_SIGNATUREVERIFIER_H
+#define WINSPARKLE_SIGNATUREVERIFIER_H
 
 #include <cstdint>
 #include <stdexcept>
@@ -56,4 +56,4 @@ public:
 
 } // namespace winsparkle
 
-#endif // _signatureverifier_h_
+#endif // WINSPARKLE_SIGNATUREVERIFIER_H

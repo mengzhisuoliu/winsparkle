@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _appcontroller_h_
-#define _appcontroller_h_
+#ifndef WINSPARKLE_APPCONTROLLER_H
+#define WINSPARKLE_APPCONTROLLER_H
 
 #include "winsparkle.h"
 #include "threads.h"
@@ -180,4 +180,4 @@ private:
 
 } // namespace winsparkle
 
-#endif // _appcontroller_h_
+#endif // WINSPARKLE_APPCONTROLLER_H

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _settings_h_
-#define _settings_h_
+#ifndef WINSPARKLE_SETTINGS_H
+#define WINSPARKLE_SETTINGS_H
 
 #include "winsparkle.h"
 #include "threads.h"
@@ -391,4 +391,4 @@ private:
 
 } // namespace winsparkle
 
-#endif // _settings_h_
+#endif // WINSPARKLE_SETTINGS_H

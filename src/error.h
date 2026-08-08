@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _error_h_
-#define _error_h_
+#ifndef WINSPARKLE_ERROR_H
+#define WINSPARKLE_ERROR_H
 
 #include <string>
 #include <stdexcept>
@@ -93,4 +93,4 @@ void LogWarning(const char *msg);
 
 } // namespace winsparkle
 
-#endif // _error_h_
+#endif // WINSPARKLE_ERROR_H

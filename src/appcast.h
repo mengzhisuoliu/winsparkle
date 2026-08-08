@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _appcast_h_
-#define _appcast_h_
+#ifndef WINSPARKLE_APPCAST_H
+#define WINSPARKLE_APPCAST_H
 
 #include <string>
 #include <vector>
@@ -112,4 +112,4 @@ struct Appcast
 
 } // namespace winsparkle
 
-#endif // _appcast_h_
+#endif // WINSPARKLE_APPCAST_H

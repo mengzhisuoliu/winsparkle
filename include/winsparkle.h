@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _winsparkle_h_
-#define _winsparkle_h_
+#ifndef WINSPARKLE_H
+#define WINSPARKLE_H
 
 #include <stddef.h>
 #include <time.h>
@@ -659,4 +659,4 @@ WIN_SPARKLE_API void __cdecl win_sparkle_check_update_without_ui();
 }
 #endif
 
-#endif // _winsparkle_h_
+#endif // WINSPARKLE_H

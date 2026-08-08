@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _updatedownloader_h_
-#define _updatedownloader_h_
+#ifndef WINSPARKLE_UPDATEDOWNLOADER_H
+#define WINSPARKLE_UPDATEDOWNLOADER_H
 
 #include "threads.h"
 #include "appcast.h"
@@ -66,4 +66,4 @@ private:
 
 } // namespace winsparkle
 
-#endif // _updatedownloader_h_
+#endif // WINSPARKLE_UPDATEDOWNLOADER_H

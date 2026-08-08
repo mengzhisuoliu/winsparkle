@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _winsparkle_version_h_
-#define _winsparkle_version_h_
+#ifndef WINSPARKLE_VERSION_H
+#define WINSPARKLE_VERSION_H
 
 /*--------------------------------------------------------------------------*
                          Version information
@@ -61,4 +61,4 @@
                                       WIN_SPARKLE_VERSION_MINOR, \
                                       WIN_SPARKLE_VERSION_MICRO)
 
-#endif // _winsparkle_version_h_
+#endif // WINSPARKLE_VERSION_H

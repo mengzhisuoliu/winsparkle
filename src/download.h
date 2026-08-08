@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _download_h_
-#define _download_h_
+#ifndef WINSPARKLE_DOWNLOAD_H
+#define WINSPARKLE_DOWNLOAD_H
 
 #include <string>
 
@@ -96,4 +96,4 @@ void DownloadFile(const std::string& url, IDownloadSink *sink, Thread *onThread,
 
 } // namespace winsparkle
 
-#endif // _download_h_
+#endif // WINSPARKLE_DOWNLOAD_H

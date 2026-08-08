@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _ui_h_
-#define _ui_h_
+#ifndef WINSPARKLE_UI_H
+#define WINSPARKLE_UI_H
 
 #include "threads.h"
 #include "appcast.h"
@@ -127,4 +127,4 @@ private:
 
 } // namespace winsparkle
 
-#endif // _ui_h_
+#endif // WINSPARKLE_UI_H
