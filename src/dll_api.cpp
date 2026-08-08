@@ -33,7 +33,7 @@
 #include "updatedownloader.h"
 
 #include <ctime>
-#include <windows.h>
+#include "wrapwin.h"
 
 using namespace winsparkle;
 

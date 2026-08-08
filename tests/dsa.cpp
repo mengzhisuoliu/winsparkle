@@ -10,7 +10,7 @@
 #include <thread>
 #include <vector>
 
-#include <windows.h>
+#include "wrapwin.h"
 
 using namespace winsparkle;
 

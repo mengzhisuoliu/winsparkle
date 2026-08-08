@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <windows.h>
+#include "wrapwin.h"
 
 using namespace winsparkle;
 

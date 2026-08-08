@@ -39,7 +39,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include <windows.h>
+#include "wrapwin.h"
 #include <wincrypt.h>
 
 #ifdef _MSC_VER

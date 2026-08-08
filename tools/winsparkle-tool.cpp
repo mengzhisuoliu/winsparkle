@@ -33,8 +33,7 @@
 #include <stdexcept>
 #include <string>
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include "wrapwin.h"
 #include <wincrypt.h>
 #ifdef _MSC_VER
 #pragma comment(lib, "crypt32.lib")

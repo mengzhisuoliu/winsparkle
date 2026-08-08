@@ -31,7 +31,7 @@
 #include "winsparkle-version.h"
 
 #include <string>
-#include <windows.h>
+#include "wrapwin.h"
 #include <wininet.h>
 
 #ifndef INTERNET_OPTION_COMPRESSED_CONTENT_LENGTH

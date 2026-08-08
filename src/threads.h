@@ -28,7 +28,7 @@
 
 #include "error.h"
 
-#include <windows.h>
+#include "wrapwin.h"
 
 namespace winsparkle
 {

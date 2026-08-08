@@ -56,6 +56,9 @@
     <ClInclude Include="src\signatureverifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\wrapwin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\appcast.cpp">

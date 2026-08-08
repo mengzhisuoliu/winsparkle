@@ -32,7 +32,7 @@
 #include <cstdlib>
 #include <iterator>
 #include <vector>
-#include <windows.h>
+#include "wrapwin.h"
 
 namespace winsparkle
 {

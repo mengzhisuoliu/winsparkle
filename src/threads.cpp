@@ -25,7 +25,7 @@
 
 #include "threads.h"
 
-#include <windows.h>
+#include "wrapwin.h"
 #include <process.h>
 
 namespace winsparkle

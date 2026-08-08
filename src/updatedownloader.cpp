@@ -31,6 +31,9 @@
 #include "error.h"
 #include "signatureverifier.h"
 
+#include "wrapwin.h"
+#include <shellapi.h>
+
 #include <wx/string.h>
 
 #include <algorithm>
@@ -111,8 +114,7 @@ struct UpdateDownloadSink : public IDownloadSink
     {
         // Use the best of the information we have: appcast-provided length (which may be missing)
         // and Content-Length (this call; may be wrong if server sends compressed data).
-        using namespace std;
-        m_total = max(m_total, l);
+        m_total = std::max(m_total, l);
     }
 
     virtual void SetFilename(const std::wstring& filename)

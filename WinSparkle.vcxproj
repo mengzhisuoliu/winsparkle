@@ -296,6 +296,7 @@
     <ClInclude Include="src\updatedownloader.h" />
     <ClInclude Include="src\utils.h" />
     <ClInclude Include="src\signatureverifier.h" />
+    <ClInclude Include="src\wrapwin.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\winsparkle.rc" />
